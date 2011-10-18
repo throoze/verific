@@ -1,0 +1,214 @@
+********************************************************************************
+*                                                                              *
+*   PROYECTO 1: Aplicacion para la verificación de cambios en directorios      *
+*               remotos.                                                       *
+*                                                                              *
+*   Universidad Nacional Experimental Simón Bolívar                            *
+*   Departamento de Computación y Tecnología de la Información                 *
+*   Redes de computadoras 1                                                    *
+*   Trimestre Septiembre - Diciembre 2011                                      *
+*   Profesores: Ricardo Gonzales, Carlos Gómez                                 *
+*                                                                              *
+*   Autores:                                                                   *
+*        - Victor De Ponte,   05-38087                                         *
+*        - Jerilyn Goncalves, 05-38242                                         *
+*                                                                              *
+*   Versión: 1.0 17.10.2011                                                    *
+*                                                                              *
+********************************************************************************
+
+1.- TABLA DE CONTENIDOS:
+
+      1.- Tabla de contenidos
+      2.- Esquema de desarrollo
+      3.- Compilación
+      4.- Ejecución
+      5.- Generación de documentación
+      6.- Estado actual del proyecto
+
+2.- ESQUEMA DE DESARROLLO
+
+    A continuacion un pseudo código del esqueleto del proyecto:
+
+##################################### CÓDIGO ###################################
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> archivo main.c
+    #define NUM_INTENTOS 3
+    void oldContHandler();
+    int pausado = 0;
+
+    /**
+     * Nuevo manejador de la señal SIGUSR1
+     * Indica al proceso que debe pausarse
+     */
+    void sigUsr1Handler() {
+      if (!pausado) {
+        pausado = true;
+      } else {
+        // Mensaje: Error, el programa ya está pausado. Comando Ignorado.
+      }
+    }
+
+    /**
+     * Nuevo manejador de la señal SIGUSR2
+     * Indica al proceso que debe terminar
+     */
+    void sigUsr2Handler() {
+         wait(proceso hijo);
+
+         // Mostrar mensaje de despedida
+         sleep(2);
+         exit(0);
+    }
+
+    /**
+     * Nuevo manejador de la señal SIGCONT
+     * Indica al proceso que debe continuar, luego de una pausa.
+     */
+    void sigUsrHandler() {
+        if (pausado) {
+          pausado = false;
+        } else {
+          // Mensaje: error, el programa no está pausado. Comando ignorado.
+        }
+    }
+
+    void pausar() {
+       while(pausado) {
+           pause();
+       }
+    }
+
+    int main(argc, argv[]) {
+        // Procesar parámetros
+
+        int t;
+        if (t no fue definido) {
+          t = 30;
+        }
+
+        char* directorios[];
+        int n = sizeof(directorios/sizeof(char*));
+        int i;
+        List archivos[n];
+
+
+        /* Crear el proceso hijo que se encargará de monitorizar la entrada
+         * estandar, para recibir los comandos de entrada.
+         */
+
+
+        for (i =0; i < n; i++)
+        do
+           int connected;
+           int connectionAttempts;
+
+           pausar();
+           while (!connected && connectionAttempts < NUM_INTENTOS ) {
+             //Tratar de establecer la conección con directorios[i]
+
+             //incrementar connectionAttempts
+           }
+           pausar();
+           /* Procesar la info recibida del servidor y preparar una estructura
+            * con la lista de archivos recibida.
+            */
+
+
+           /* Preparar una estructura con la lista de archivos y alguna otra
+            * info a pasarle a un nuevo hilo que verificarálas modificaciones.
+            */
+
+           pausar();
+           // Crear un nuevo hilo
+
+           // Esperar por todos los hilos
+
+           sleep(t);
+        od
+
+        return 0;
+    }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> archivo monitor.c
+
+// Mostrar mensaje de bienvenida
+
+// Mostrar instrucciones (incluir opcion para volver a mostrar instrucciones)
+
+void help() {
+     //imprimir mensaje de ayuda;
+}
+
+void main (argc, argv[]) {
+  while (true) {
+      char* in = entrada por teclado;
+
+      if (in.length > 1) {
+         // Mensaje de error
+         help();
+         continue;
+      }
+
+      char entrada = in[0];
+
+      switch(entrada) {
+        case 'p' :
+             // Enviar señal SIGUSR1 al proceso padre
+             break;
+        case 'c' :
+             // Enviar señal SIGCONT al proceso padre
+             break;
+        case 's' :
+             // Enviar señal SIGUSR2 al proceso padre
+             exit(0);
+        default :
+             // Mensaje de error
+             help();
+      }
+  }
+}
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+##################################### CÓDIGO ###################################
+
+3.- COMPILACIÓN
+
+        Para compilar este proyecto a través de la linea de comandos, sitúese en
+    la carpeta de las fuentes del proyecto y ejecute el comando 'make'. Para e-
+    llo, debe disponer de los paquetes 'gcc' y 'make'.
+
+        Una vez ejecutado este comando, se generará un archivo binario de nombre
+    'verific', el cual será utilizado para la ejecución.
+
+4.- EJECUCIÓN
+
+    La sintaxis de la ejecución del programa será como sigue:
+
+         $ verific  [-t num_segundos] [-d directorio] [-a archivo]
+
+    Donde:
+
+        num_segundos:   Valor entero que representa el numero de segundos que
+                        deben transcurrir entre dos revisiones. Valor por defec-
+                        to: 30 segundos.
+
+          directorio:   Especifica el URL absoluto del directorio a monitorizar.
+
+         archivo.txt:   Archivo que contendrá los URL absolutos de los directo-
+                        rios a monitorizar.
+
+        Debe especificarse al menos la opción -d, o la opción -a. en caso de que
+    las opciónes -d y -a sean especificadas simultaneamente, sólo será tomada en
+    cuenta la opción -d. Si el parámetro –t no es especificado, se puede asumir
+    un valor por defecto de 30 segundos.
+
+5.- GENERACIÓN DE DOCUMENTACIÓN
+
+    ????????????????????????
+
+6.- ESTADO ACTUAL DEL PROYECTO
+
+    En este momento, el proyecto sólo procesa parametros de entrada.
