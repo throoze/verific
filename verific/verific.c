@@ -1,130 +1,225 @@
-/****************************************************************************
+/**
+ ****************************************************************************
+ * @file verific.c                                                          *
+ * @brief PROYECTO 1: Aplicacion para la verificación de cambios en         *
+ *        directorios.                                                      *
+ *                                                                          *
+ * Programa principal del proyecto.                                         *
+ *                                                                          *
+ * Universidad Nacional Experimental Simón Bolívar                          *
+ * Departamento de Computación y Tecnología de la Información               *
+ * Redes de computadoras 1                                                  *
+ * Trimestre Septiembre - Diciembre 2011                                    *
+ * Profesores: Ricardo Gonzales, Carlos Gómez                               *
  * PROYECTO 1: Aplicacion para la verificación de cambios en directorios    *
- *                                                                          *
- * verific.c                                                                *
- *                                                                          *
+ *             remotos.                                                     *
  * @author Jerilyn Goncalves, 05-38242                                      *
  * @author Victor de Ponte, 05-38087                                        *
  * @version 1.0                                                             *
+ * @date 10/14/2011                                                         *
  ****************************************************************************/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
+#include "verific.h"
 
-/****************************************************************************
- * mensaje_ayuda                                                            *
- *                                                                          *
- * Función que imprime en pantalla un mensaje de ayuda con la sintaxis,     *
- * y la descripción de los parámetros de invocación del programa            *
- ****************************************************************************/
+///Almacena la lista de directorios a monitorizar.
+ListaStr *directorios;
+
+
 void mensaje_ayuda ()
 {
 
-    printf("\nEL PROGRAMA DEBE SER INVOCADO DE LA SIGUIENTE FORMA:\n");
-    printf("\tverific  [-t num_segundos] [-d directorio] [-a archivo]\n");
+    printf("\nSINTAXIS:\n");
+    printf("\tverific [-t num_segundos] [-d directorio] [-a archivo]\n");
     printf("DONDE:\n");
-    printf("\t-t num_segundos: Valor entero que representa el numero de segundos que deben\n");
-    printf("\t\t\t transcurrir entre dos revisiones\n");
-    printf("\t-d directorio: Especifica el URL del directorio a monitorizar\n");
-    printf("\t-a archivo.txt: Archivo que contendrá los URL de los directorios a monitorizar\n");
-    printf("\t[ ]: Indica que lo que esté entre esos símbolos es opcional\n");
-    printf("\tLA ESPECIFICACION DEL directorio O DEl archivo ES OBLIGATORIA.\n");
-    printf("\tEn caso de que la opción -d y -a sean especificadas simultanea-\n");
-    printf("\tmente, se verificará solamente el directorio que esta especi-\n");
-    printf("\tficado en el parámetro –d. Si el parámetro –t no es especificado,\n");
-    printf("\tse puede asumir un valor por defecto de 30 segundos.\n");
+    printf("\tnum_segundos:\tValor entero que representa el numero de segundos que\n");
+    printf("\t\t\tdeben transcurrir entre dos revisiones.\n\n");
+    printf("\tdirectorio:\tEspecifica el URL del directorio a\n\t\t\tmonitorizar.\n\n");
+    printf("\tarchivo:\tArchivo que contendrá los URL de los directorios a\n\t\t\tmonitorizar.\n\n");
+    printf("\tLas banderas entre corchetes ([]) son opcionales.\n");
+    printf("\tDebe especificarse al menos la opción -d o la opción -a. ");
+    printf("En caso de que\n\tlas opciónes -d y -a sean especificadas simultanea");
+    printf("mente, se verificará\n\tsolamente el directorio que esta especi");
+    printf("ficado en el parámetro -d.\n\tSi el parámetro -t no es especificado, ");
+    printf("se puede asumir un valor por\n\tdefecto de 30 segundos.\n");
 }
 
-/****************************************************************************
- * main                                                                     *
- *                                                                          *
- * Programa principal                                                       *
- *                                                                          *
- * Donde:                                                                   *
- *  argc: Número de parametros con el que se hizo la invocación al          *
- *        programa.                                                         *
- *  argv: verific  [-t num_segundos] [-d directorio] [-a archivo]           *
- *        -t num_segundos:  Valor entero que representa el numero de segun_ *
- *                          dos que deben transcurrir entre dos revisiones  *
- *                          consecutivas del directorio(s) a monitorizar.   *
- *                          Por defecto: 30                                 *
- *        -d directorio:    Corresponde a la direccion absoluta de un di_   *
- *                          rectorio (URL) que sera monitorizado            *
- *        -a archivo:       Archivo en formato de texto plano donde cada    *
- *                          linea especifica el URL correspondiente a un    *
- *                          directorio cuya informacion se desea verificar  *
- ****************************************************************************/
-int main (int argc, char * argv[])
-{
+void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
+                        int *dir_especificado, int *arch_especificado) {
+  // tests triviales
+  if (argc==1) {
+    printf("verific: Usted no especificó ningún parámetro.\n");
+    mensaje_ayuda();
+    exit(-1);
+  } else if (argc < 3) {
+    printf("verific: Se han especificado parámetros insuficientes.\n");
+    mensaje_ayuda();
+    exit(-1);
+  } else if (7 < argc) {
+    printf("verific: Se han especificado parámetros de más.\n");
+    mensaje_ayuda();
+    exit(-1);
+  }
 
-    printf("\nPROYECTO 1: Monitor de cambios en un directorio\n");
-    int dir_especificado=0;
-    int arch_especificado=0;
-    int contador;
-    int tipo_entero;
-    int num_segundos=30; //Intervalo de tiempo en segundos para la revision.
-    char * d="."; //Directorio a analizar.
-    char * archivo; //Archivo que contendrá la lista de directorios y archivos encontrados en el directorio.
-
-    //Analiza los parámetros con los que fue invocado el programa:
-    if (argc==1) {
-            printf("\nNO HA ESPECIFICADO LOS PARAMETROS DEL PROGRAMA\n");
-            mensaje_ayuda(); //Llama a la funcion que muestra en pantalla el mensaje de ayuda.
-            printf("\nEL PROGRAMA HA TERMINADO\n\n");
-            exit(0);
-    } else {
-        for (contador=1; contador<argc; contador++) {
-            //Intervalo de tiempo:
-            if (strcmp(argv[contador],"-t")==0){
-                //Determina si no se ingreso el intervalo correctamente:
-                if((argv[contador+1])==NULL || (sscanf(argv[contador+1],"%d",&tipo_entero)==0)){
-                    printf("\n\tFALTO INGRESAR EL INTERVALO DE TIEMPO (num_segundos)\n");
-                    mensaje_ayuda(); //Llama a la funcion que muestra en pantalla el mensaje de ayuda.
-                    printf("\nEL PROGRAMA HA TERMINADO\n\n");
-                    exit(0);
-                } else {
-                    num_segundos=atoi(argv[contador+1]); //Intervalo de tiempo en segundos para la revision.
-                    //printf("\n\tEl intervalo de tiempo en segundos para la revision es: %d\n",num_segundos);
-                }
-            //Directorio a analizar:
-            } else if (strcmp(argv[contador],"-d")==0) {
-                d=argv[contador+1];
-                //printf("\n\tLa direccion del directorio a analizar es: %s\n",d);
-                dir_especificado=1;
-            } else if (strcmp(argv[contador],"-a")==0) {
-                archivo=argv[contador+1];
-                //printf("\n\tEl archivo con la direccion del directorio a analizar es: %s\n", archivo);
-                arch_especificado=1;
-            } else {
-                printf("\nNO HA ESPECIFICADO LOS PARAMETROS DEL PROGRAMA CORRECTAMENTE\n");
-                mensaje_ayuda(); //Llama a la funcion que muestra en pantalla el mensaje de ayuda.
-                printf("\nEL PROGRAMA HA TERMINADO\n\n");
-                exit(0);
-            }
-            contador++;
-        }
-    }
-
-    if (dir_especificado==0 && arch_especificado==0) {
-        printf("\nNO HA ESPECIFICADO EL DIRECTORIO A MONITORIZAR\n");
-        mensaje_ayuda(); //Llama a la funcion que muestra en pantalla el mensaje de ayuda.
-        printf("\nEL PROGRAMA HA TERMINADO\n\n");
-        exit(0);
-    } else {
-        printf("\n\tEl intervalo de tiempo en segundos para la revision es: %d\n",num_segundos);
-        if (dir_especificado) {
-            printf("\n\tLa direccion del directorio a analizar es: %s\n",d);
+  // Procesamiento:
+  *t = 30; // Valor por defecto
+  int opt; // Contenedor de la opción a ser probada en el switch-case
+  char *directorio;
+  char *archivo;
+  while ((opt = getopt (argc, argv, "t:d:a:")) != -1) {
+    switch (opt)
+      {
+      case 't':
+        //*t = atoi(optarg);
+        *t = strtol(optarg, (char **) NULL, 10);
+        break;
+      case 'd':
+        *dir_especificado = TRUE;
+        // VERIFICAR QUE, EN EFECTO, SEA UN URL
+        directorio = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+        strcpy(directorio,optarg);
+        break;
+      case 'a':
+        *arch_especificado = TRUE;
+        // VERIFICAR QUE NO COMIENZE POR '-' (QUE SEA LA SIGUIENTE OPCIÓN)
+        archivo = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+        strcpy(archivo,optarg);
+        break;
+      case ':' :
+      case '?':
+        if (optopt == 't' || optopt == 'd' || optopt == 'a') {
+          fprintf(stderr, "verific: La opción -%c requiere de un argumento.\n",optopt);
+        } else if (isprint(optopt)) {
+          fprintf (stderr, "verific: Opción desconocida '-%c'.\n", optopt);
         } else {
-            printf("\n\tEl archivo con la direccion del directorio a analizar es: %s\n", archivo);
+          fprintf (stderr,
+                   "verific: Caracter de opción desconocido '\\x%x'.\n",
+                   optopt);
         }
-        //Llama a la función que se encarga del analisis del directorio:
-        printf("\nANALISIS\n");
-        printf("\nEL PROGRAMA HA TERMINADO\n\n");
-    }
+      default:
+        mensaje_ayuda();
+        exit(-1);
+      }
+  }
+
+  if (!(*dir_especificado || *arch_especificado)) {
+    printf("verific: Debe especificar al menos la opción -d o la opción -a.\n");
+    mensaje_ayuda();
+    exit(-1);
+  }
+
+  if (*t <= 0) {
+    printf("verific: El intervalo de tiempo debe ser un entero positivo (mayor que cero).\n");
+    mensaje_ayuda();
+    exit(-1);
+  }
+
+  if (*dir_especificado) {
+    *aVerificar = (char *) malloc((strlen(directorio) + 1) * sizeof(char));
+    strcpy(*aVerificar,directorio);
+  } else if (*arch_especificado) {
+    *aVerificar = (char *) malloc((strlen(archivo) + 1) * sizeof(char));
+    strcpy(*aVerificar,archivo);
+  }
+
+  if (*dir_especificado) {
+    free(directorio);
+  }
+  if (*arch_especificado) {
+    free(archivo);
+  }
+}
+
+/**
+ * En caso de poder, lee el archivo 'file', lo valida y prepara una estructura
+ * de lista, con los URL's leidos del archivo, la cual retorna.
+ *
+ * @param file Nombre del archivo a leer.
+ * @return Apuntador a lista con los URL's a monitorizar.
+ */
+ListaStr *leerArchivo(char * file) {
+
+}
+
+/**
+ * Programa principal
+ *
+ * @param argc Número de parametros con el que se hizo la invocación
+ *             programa.
+ * @param argv Valores de los argumentos pasados al programa por línea de
+ *             comandos. Los valores válidos corresponden con lo especificado en
+ *             la descripción del proyecto.
+ */
+int main (int argc, char **argv) {
+
+  ///Tiempo en segundos entre cada verificación. Valor por defecto: 30s
+  int t;
+
+  ///Número de directorios a verificar.
+  int n = 1;
+
+  /**
+   * TRUE si se especificó un directorio por linea de comandos;
+   * FALSE en caso contrario.
+   */
+  int dir_especificado = 0;
+
+  /**
+   * TRUE si se especificó un archivo por linea de comandos;
+   * FALSE en caso contrario.
+   */
+  int arch_especificado = 0;
+
+  /**
+   * Contendra el nombre ya sea del único directorio a verificar, o del archivo
+   * a leer el cual contendrá un URL por linea de un directorio a modificar.
+   */
+  char *aVerificar;
+
+  procesarArgumentos(argc,argv,&t,&aVerificar,&dir_especificado,
+                     &arch_especificado);
+
+  int sockfd;
+  struct sockaddr_in serveraddr;
+
+  if (dir_especificado) {
+    directorios = newListaStr();
+    addLS(directorios,aVerificar);
+  } else {
+    directorios = leerArchivo(aVerificar);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  printf("El intervalo de tiempo esta setteado a %d segundos\n",t);
+  if (dir_especificado){
+    printf("Se especificó un URL a ser verificado, de nombre %s\n", aVerificar);
+  } else if (arch_especificado) {
+    printf("Se especificó un archivo para ser leido, de nombre %s\n", aVerificar);
+  }
+
+  LSLiberar(directorios);
+  return 0;
 }

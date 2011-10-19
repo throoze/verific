@@ -1,2 +1,5 @@
 *~
 *.o
+sglib-1.0.4*
+verific/verific
+verific/nul
