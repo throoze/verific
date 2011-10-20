@@ -17,8 +17,8 @@
 ################################################################################
 
 EXEC = verific
-LIBS =
-OBJS = verific.o
+LIBS = almacenamiento.h expreg.h util.h
+OBJS = verific.o almacenamiento.o expreg.o util.o
 
 CFLAGS = -w
 #CFLAGS =
@@ -30,6 +30,15 @@ ${EXEC}: ${OBJS}
 
 verific.o: verific.c verific.h ${LIBS}
 	gcc ${CFLAGS} -c verific.c
+
+almacenamiento.o: almacenamiento.c almacenamiento.h
+	gcc ${CFLAGS} -c almacenamiento.c
+
+expreg.o: expreg.c expreg.h
+	gcc ${CFLAGS} -c expreg.c
+
+util.o: util.c util.h
+	gcc ${CFLAGS} -c util.c
 
 check-syntax:
 	cc -o nul -Wall -S ${CHK_SOURCES}

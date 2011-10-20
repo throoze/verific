@@ -1,6 +1,6 @@
 /**
  ****************************************************************************
- * @file verific.c                                                          *
+ * @file verific.h                                                          *
  * @brief PROYECTO 1: Aplicacion para la verificación de cambios en         *
  *        directorios.                                                      *
  *                                                                          *
@@ -26,11 +26,31 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
 #define TRUE 1
 #define FALSE 0
 #endif
 
 #include "almacenamiento.h"
+#include "expreg.h"
+#ifndef UTL
+#define UTL
+#include "util.h"
+#endif
+
+
+///Expresión regular POSIX que unifica con un URL válido.
+char *URL_REGEXP = "^http\://[a-zA-Z0-9_-]*\\.?[a-zA-Z0-9_-]+(\\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|ve|[a-zA-Z]{2}(:[0-9]{1,5})?){1})(/[a-zA-Z0-9:#@%/;$()~_?\+-=\\\.&]*|/?)$";
+// No utilizo esta, porque aqui sólo usaremos el protocolo http.
+//char *URL_REGEXP = "^(https?|ftp|gopher|telnet|file|notes|ms-help)\://[a-zA-Z0-9_-]*\\.?[a-zA-Z0-9_-]+(\\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|ve|[a-zA-Z]{2}(:[0-9]{1,5})?){1})(/[a-zA-Z0-9:#@%/;$()~_?\+-=\\\.&]*|/?)$";
+
+///Número de directorios a verificar.
+int n = 1;
+
+///Arreglo de directorios a monitorizar.
+char **directorios;
+
 
 /**
  * Función que imprime en pantalla un mensaje de ayuda con la sintaxis,
@@ -59,3 +79,12 @@ void mensaje_ayuda ();
  */
 void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
                         int *dir_especificado, int *arch_especificado);
+
+/**
+ * En caso de poder, lee el archivo 'file', lo valida y prepara una estructura
+ * de lista, con los URL's leidos del archivo, la cual retorna.
+ *
+ * @param file Nombre del archivo a leer.
+ * @return Apuntador a lista con los URL's a monitorizar.
+ */
+ListaStr *leerArchivo(char * file);

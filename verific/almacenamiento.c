@@ -1,6 +1,6 @@
 /**
  ****************************************************************************
- * @file verific.c                                                          *
+ * @file almacenamiento.c                                                   *
  * @brief Librería que define estructuras de almacenamiento de datos, y     *
  *        operaciones aplicadas sobre dichas estructuras.                   *
  *                                                                          *
@@ -25,8 +25,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
 #define FALSE 0
 #define TRUE 1
+#endif
+
+#ifndef UTL
+#define UTL
+#include "util.h"
 #endif
 
 #ifndef EDG
@@ -38,7 +45,7 @@
 
 /*INICIO Funciones y Procedimientos referentes al tipo ListaStr*/
 CajaStr *newCajaStr() {
-  CajaStr *nueva = (CajaStr *) malloc(sizeof(CajaStr));
+  CajaStr *nueva = (CajaStr *) xmalloc(sizeof(CajaStr));
   if (nueva != NULL) {
     nueva->sig = nueva->ant = NULL;
     nueva->pos = 0;
@@ -50,7 +57,7 @@ CajaStr *newCajaStr() {
 }
 
 ListaStr *newListaStr() {
-  ListaStr *nueva = (ListaStr *) malloc(sizeof(ListaStr));
+  ListaStr *nueva = (ListaStr *) xmalloc(sizeof(ListaStr));
   if (nueva != NULL) {
     nueva->head = nueva->tail = NULL;
     nueva->size = 0;
@@ -124,7 +131,7 @@ void getLS(ListaStr *list, int posi, char *ans) {
 }
 
 char **LSToArray(ListaStr *list) {
-  char **arr = (char **) malloc(list->size * sizeof(char *));
+  char **arr = (char **) xmalloc(list->size * sizeof(char *));
   CajaStr *aux = list->head;
   register int i = 0;
   while (aux) {

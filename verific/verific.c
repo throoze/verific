@@ -21,10 +21,6 @@
 
 #include "verific.h"
 
-///Almacena la lista de directorios a monitorizar.
-ListaStr *directorios;
-
-
 void mensaje_ayuda ()
 {
 
@@ -74,14 +70,25 @@ void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
         break;
       case 'd':
         *dir_especificado = TRUE;
-        // VERIFICAR QUE, EN EFECTO, SEA UN URL
-        directorio = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+        int isURL = matches(optarg,URL_REGEXP);
+        if (isURL == REG_NOMATCH) {
+          printf("verific: El directorio especificado debe ser un URL válido.\n");
+          mensaje_ayuda();
+          exit(-1);
+        }
+        directorio = (char *) xmalloc((strlen(optarg) + 1) * sizeof(char));
         strcpy(directorio,optarg);
         break;
       case 'a':
         *arch_especificado = TRUE;
-        // VERIFICAR QUE NO COMIENZE POR '-' (QUE SEA LA SIGUIENTE OPCIÓN)
-        archivo = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+        char *pattern = "^-[a-zA-Z]+$";
+        int isNotOption = matches(optarg,pattern);
+        if (!isNotOption) {
+          printf("verific: La opción -a requiere de un argumento.\n");
+          mensaje_ayuda();
+          exit(-1);
+        }
+        archivo = (char *) xmalloc((strlen(optarg) + 1) * sizeof(char));
         strcpy(archivo,optarg);
         break;
       case ':' :
@@ -114,10 +121,10 @@ void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
   }
 
   if (*dir_especificado) {
-    *aVerificar = (char *) malloc((strlen(directorio) + 1) * sizeof(char));
+    *aVerificar = (char *) xmalloc((strlen(directorio) + 1) * sizeof(char));
     strcpy(*aVerificar,directorio);
   } else if (*arch_especificado) {
-    *aVerificar = (char *) malloc((strlen(archivo) + 1) * sizeof(char));
+    *aVerificar = (char *) xmalloc((strlen(archivo) + 1) * sizeof(char));
     strcpy(*aVerificar,archivo);
   }
 
@@ -129,15 +136,9 @@ void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
   }
 }
 
-/**
- * En caso de poder, lee el archivo 'file', lo valida y prepara una estructura
- * de lista, con los URL's leidos del archivo, la cual retorna.
- *
- * @param file Nombre del archivo a leer.
- * @return Apuntador a lista con los URL's a monitorizar.
- */
+// HACER ESTO!!!!
 ListaStr *leerArchivo(char * file) {
-
+  return NULL;
 }
 
 /**
@@ -153,9 +154,6 @@ int main (int argc, char **argv) {
 
   ///Tiempo en segundos entre cada verificación. Valor por defecto: 30s
   int t;
-
-  ///Número de directorios a verificar.
-  int n = 1;
 
   /**
    * TRUE si se especificó un directorio por linea de comandos;
@@ -178,40 +176,18 @@ int main (int argc, char **argv) {
   procesarArgumentos(argc,argv,&t,&aVerificar,&dir_especificado,
                      &arch_especificado);
 
-  int sockfd;
-  struct sockaddr_in serveraddr;
 
   if (dir_especificado) {
-    directorios = newListaStr();
-    addLS(directorios,aVerificar);
+    directorios = (char **) xmalloc(1*sizeof(char*));
+    directorios[0] = aVerificar;
   } else {
-    directorios = leerArchivo(aVerificar);
+    ListaStr *dirs = leerArchivo(aVerificar);
+    directorios = LSToArray(dirs);
+    LSLiberar(dirs);
+    free(dirs);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
 
   printf("El intervalo de tiempo esta setteado a %d segundos\n",t);
   if (dir_especificado){
@@ -220,6 +196,6 @@ int main (int argc, char **argv) {
     printf("Se especificó un archivo para ser leido, de nombre %s\n", aVerificar);
   }
 
-  LSLiberar(directorios);
+  free(directorios);
   return 0;
 }

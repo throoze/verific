@@ -1,6 +1,6 @@
 /**
  ****************************************************************************
- * @file verific.c                                                          *
+ * @file almacenamiento.h                                                   *
  * @brief Librería que define estructuras de almacenamiento de datos, y     *
  *        operaciones aplicadas sobre dichas estructuras. (HEADER)          *
  *                                                                          *
@@ -24,8 +24,15 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
 #define TRUE 1
 #define FALSE 0
+#endif
+
+#ifndef UTL
+#define UTL
+#include "util.h"
 #endif
 
 #ifndef EDG
