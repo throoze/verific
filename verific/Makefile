@@ -18,15 +18,23 @@
 
 EXEC = verific
 LIBS = almacenamiento.h expreg.h util.h
-OBJS = verific.o almacenamiento.o expreg.o util.o
+OBJS = almacenamiento.o expreg.o util.o
 
-CFLAGS = -w
-#CFLAGS =
+#CFLAGS = -w
+CFLAGS =
+MAINFLAGS =
+EXECS = verific verificador
 
-all: ${EXEC}
+all: ${EXECS}
 
-${EXEC}: ${OBJS}
-	gcc ${CFLAGS} ${OBJS} -o ${EXEC}
+verificador: verificador.o ${OBJS}
+	gcc ${CFLAGS} verificador.o ${OBJS} ${MAINFLAGS} -o verificador
+
+verific: verific.o ${OBJS}
+	gcc ${CFLAGS} verific.o ${OBJS} ${MAINFLAGS} -o verific
+
+verificador.o: verificador.c verificador.h ${LIBS}
+	gcc ${CFLAGS} -c verificador.c
 
 verific.o: verific.c verific.h ${LIBS}
 	gcc ${CFLAGS} -c verific.c

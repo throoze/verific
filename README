@@ -212,32 +212,23 @@ void main (argc, argv[]) {
 
 6.- ESTADO ACTUAL DEL PROYECTO
 
-    En este momento, el proyecto sólo procesa parametros de entrada.
+    En este momento, el proyecto presenta al usuario una interfaz amigable, crea
+    un proceso hijo trabajador por cada directorio a monitorizar, y estos hijos,
+    a su vez crean el socket y realizan la conexión con el directorio asignado,
+    según cada el intervalo de tiempo especificado por linea de comandos.
+    
+    Por hacer:
+        - Actualizar la sección de ESQUEMA DE DESARROLLO, la cual todavía pre-
+          senta una aproximación inmadura del problema.
+        - Procesar la respuesta del servidor y almacenar la lista de archivos
+          recibida para realizar el monitoreo.
+        - Redirigir la salida estándar de los procesos hijos a la salida del
+          proceso padre.
+        - Leer el archivo especificado por linea de comandos y generar la lista
+          de directorios.
+        - Documentar el archivo correspondiente al proceso trabajador.
+        - Mejorar el encabezado del archivo correspondiente al proceso traba-
+          jador. Colocar las firmas de las funciones.
 
 7.- LIBRERÍAS DE TERCEROS
-
-    a) SGLIB - A Simple Generic Library for C
-          - Archivos fuente:
-             sglib.h
-          - Sitio web:
-             http://sglib.sourceforge.net/
-          - Descarga:
-             http://sourceforge.net/projects/sglib/files/sglib/1.0.4/sglib-1.0.4.tar.gz/download
-          - Fuentes del proyecto:
-             http://sourceforge.net/projects/sglib/
-          - Licencia:
-             [...] you can use Sglib or its derivative forms (under the condi-
-             tion that the Copyright notice is preserved) in any project, whe-
-             ther commercial or not, free of charges. In particular, you can use
-             Sglib under the terms of any license defined as an open source li-
-             cense by the Open Source Initiative
-             (see http://www.opensource.org/).
-             This includes most common open source licenses such as the BSD li-
-             cense and GNU GPL.
-             If you need to use sglib under any particular license conditions,
-             contact the author.
-          - Garantía:
-             THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-             EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IM-
-             PLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PUR-
-             POSE, OR NON-INFRINGEMENT.
+    No se usó ninguna librería externa a las librerías de unix.

@@ -28,13 +28,15 @@ int matches(char *string, char *pattern){
     regfree (expreg);
     free(expreg);
     if ( ans == REG_ESPACE) {
-      printf("verific: Ha ocurrido un error:\nverific:%s",get_regerror(ans,expreg));
+      printf("verific: Ha ocurrido un error:\nregexec(): %s\n",get_regerror(ans,expreg));
+      printf("pattern: %s\n",pattern);
       exit(-1);
     }
     //printf("\nEl resultado de comparar el string '%s'\ncontra el patrón '%s', es: %d\n\n",string,pattern,ans);
     return ans;
   } else {
-    printf("verific: Ha ocurrido un error:\nverific:%s",get_regerror(comp,expreg));
+    printf("verific: Ha ocurrido un error:\nregcomp(): %s\n",get_regerror(comp,expreg));
+    printf("pattern: %s\n",pattern);
     exit(-1);
   }
   return -1;

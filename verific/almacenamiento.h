@@ -145,11 +145,11 @@ int isInLS(ListaStr *list, char *elem);
 
 
 /**
- * Imprime en la salida estándar la ListaInt 'lista'.
+ * Imprime en la salida estándar la Lista 'lista'.
  *
  * @author Jerilyn Goncalves, 05-38242
  * @author Victor de Ponte, 05-38087
- * @param lista ListaInt a imprimir.
+ * @param lista Lista a imprimir.
  */
 void LSprint(ListaStr *lista);
 
@@ -177,17 +177,169 @@ char *getLastLS(ListaStr *list);
 
 
 /**
- * Se encarga de devolver una ListaInt a su estado original vacía, liberando la
+ * Se encarga de devolver una Lista a su estado original vacía, liberando la
  * memoria consumida por ésta.
  *
  * @author Jerilyn Goncalves, 05-38242
  * @author Victor de Ponte, 05-38087
- * @param lote Un apuntador a la ListaInt que se desea liberar.
+ * @param lote Un apuntador a la Lista que se desea liberar.
  * @return 0 si se completó la limpieza con éxito, 1 en caso contrario.
  */
 int LSLiberar(ListaStr *lista);
 
 /*FIN Funciones y Procedimientos referentes al tipo ListaStr*/
+
+/*Definición del tipo List.*/
+
+/**
+ * Clasica lista de elementos. Es una lista de apuntadores que almacena Arch.
+ */
+typedef struct {
+  char *name;
+  char *date;
+  int size;
+} Arch;
+
+typedef struct caja Caja;
+
+struct caja {
+  Arch *data;
+  int pos;
+  Caja *sig,*ant;
+};
+
+typedef struct {
+  Caja *head,*tail;
+  int size;
+} List;
+/*FIN del tipo List.*/
+
+/*INICIO Funciones y Procedimientos referentes al tipo List*/
+/**
+ * Crea una nueva Caja, reservando la memoria necesaria para ello.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @return Un nuevo apuntador a Caja vacía.
+ */
+Caja *newCaja();
+
+/**
+ * Crea una nueva lista vacía, reservando la memoria necesaria para ello.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @return Un nuevo apuntador a una lista vacía.
+ */
+List *newList();
+
+
+/**
+ * Inserta el elemento 'elem' en la Lista '*list'
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list apuntador a la Lista donde se desea hacer la inserción.
+ * @param elem elemento a insertar en la Lista.
+ * @return Un entero que indica el estado de la inserción; 0 si fue realizada
+ *         con éxito, 1 en caso contrario.
+ */
+int add(List *list, Arch *elem);
+
+/**
+ * Elimina el elemento 'elem' en la Lista '*list'
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list apuntador a la Lista donde se desea hacer la eliminación.
+ * @param elem elemento a eliminar de la Lista.
+ */
+void delete(List *list,  Arch *elem);
+
+
+/**
+ * Devuelve el elemento en la posición pos.
+ * Retorna en la variable 'ans' el elemento almacenado en la posición 'posi'.
+ * de no existir un elemento en esa posicion, asigna NULL a 'ans'.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list Lista a consultar.
+ * @param posi Posición del elemento solicitado.
+ * @param ans  Apuntador a la salida de esta funcion.
+ */
+void get(List *list, int posi, Arch *ans);
+
+
+/**
+ * Devuelve un arreglo de String conteniendo los elementos de la lista 'list'
+ * en el mismo orden en que estaban almacenados.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list Lista a transformar en arreglo.
+ * @return Un arreglo de String que contiene los elementos de 'lista' en el
+ *         mismo orden en que estaban almacenados.
+ */
+Arch **ToArray(List *list);
+
+/**
+ * Dice si un elemento 'elem' está actualmente o no en la Lista '*list'.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list Apuntador a la Lista donde se desea hacer la búsqueda.
+ * @param elem Elemento a buscar en la Lista.
+ * @return Un entero que indica el estado de la búsqueda; 1 si se encontró el
+ *         elemento, 1 en caso contrario.
+ */
+int isIn(List *list, Arch *elem);
+
+
+/**
+ * Imprime en la salida estándar la Lista 'lista'.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param lista Lista a imprimir.
+ */
+void print(List *lista);
+
+/**
+ * Devuelve el primer elemento de la lista, y lo elimina de ésta.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list Lista a consultar.
+ * @return El primer elemento de la lista, o NULL en caso de que sea
+ *         una lista vacía.
+ */
+Arch *getFirst(List *list);
+
+/**
+ * Devuelve el último elemento de la lista, y lo elimina de ésta.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param list Lista a consultar.
+ * @return El último elemento de la lista, o NULL en caso de que sea
+ *         una lista vacía.
+ */
+Arch *getLast(List *list);
+
+
+/**
+ * Se encarga de devolver una Lista a su estado original vacía, liberando la
+ * memoria consumida por ésta.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ * @param lista Un apuntador a la Lista que se desea liberar.
+ * @return 0 si se completó la limpieza con éxito, 1 en caso contrario.
+ */
+int listFree(List *lista);
+
+/*FIN Funciones y Procedimientos referentes al tipo List*/
 
 /*----------------------------------------------------------------------------*/
 

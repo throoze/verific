@@ -32,6 +32,17 @@
 #define FALSE 0
 #endif
 
+#ifndef PROCS
+#define PROCS
+#include <sys/wait.h>
+#endif
+
+#ifndef SGNL
+#define SGNL
+#include <signal.h>
+#endif
+
+
 #include "almacenamiento.h"
 #include "expreg.h"
 #ifndef UTL
@@ -41,7 +52,9 @@
 
 
 ///Expresión regular POSIX que unifica con un URL válido.
-char *URL_REGEXP = "^http\://[a-zA-Z0-9_-]*\\.?[a-zA-Z0-9_-]+(\\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|ve|[a-zA-Z]{2}(:[0-9]{1,5})?){1})(/[a-zA-Z0-9:#@%/;$()~_?\+-=\\\.&]*|/?)$";
+char *URL_REGEXP = "^http\://[\\.a-zA-Z0-9_-]*\\.?[a-zA-Z0-9_-]+(\\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|ve|[a-zA-Z]{2}(:[0-9]{1,5})?){1})(/[a-zA-Z0-9:#@%/;$()~_?\+-=\\\.&]*|/?)$";
+
+
 // No utilizo esta, porque aqui sólo usaremos el protocolo http.
 //char *URL_REGEXP = "^(https?|ftp|gopher|telnet|file|notes|ms-help)\://[a-zA-Z0-9_-]*\\.?[a-zA-Z0-9_-]+(\\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|ve|[a-zA-Z]{2}(:[0-9]{1,5})?){1})(/[a-zA-Z0-9:#@%/;$()~_?\+-=\\\.&]*|/?)$";
 
@@ -51,16 +64,41 @@ int n = 1;
 ///Arreglo de directorios a monitorizar.
 char **directorios;
 
+///Arreglo que almacena los identificadores de los procesos hijos
+pid_t *pids;
+
+/**
+ * Manejador para la señal SIGCHLD, instalado con el objetivo de no bloquearse
+ * esperando por que los procesos hijos terminen.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void childHandler();
 
 /**
  * Función que imprime en pantalla un mensaje de ayuda con la sintaxis,
  * y la descripción de los parámetros de invocación del programa.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
  */
 void mensaje_ayuda ();
 
 /**
+ * Mensaje de ayuda en la linea de comandos.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void ayuda_cli();
+
+/**
  * Se encarga de procesar y validar los argumentos entrados por linea de
  * comandos.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
  *
  * @param argc Número de parametros con el que se hizo la invocación
  *             programa.
@@ -84,7 +122,71 @@ void procesarArgumentos(int argc, char **argv, int *t, char **aVerificar,
  * En caso de poder, lee el archivo 'file', lo valida y prepara una estructura
  * de lista, con los URL's leidos del archivo, la cual retorna.
  *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ *
  * @param file Nombre del archivo a leer.
  * @return Apuntador a lista con los URL's a monitorizar.
  */
 ListaStr *leerArchivo(char * file);
+
+
+/**
+ * Espera un solo caracter de la entrada estándar y lo devuelve sin mostrarlo.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+char getChar();
+
+
+/**
+ * Imprime por la salida estándar un mensaje de despedida.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void mens_despedida();
+
+/**
+ * Imprime por la salida estándar un mensaje que indica que el programa está
+ * pausado.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void mens_pausado();
+
+/**
+ * Imprime por la salida estándar un mensaje que indica que el programa va a
+ * continuar.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void mens_continuar();
+
+/**
+ * Se encarga de mandar una señal a los procesos hijos para matarlos.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void matarHijos();
+
+/**
+ * Se encarga de mandar una señal a los procesos hijos para pausarlos.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void pausarHijos();
+
+/**
+ * Se encarga de mandar una señal a los procesos hijos para arrancarlos de
+ * nuevo.
+ *
+ * @author Jerilyn Goncalves, 05-38242
+ * @author Victor de Ponte, 05-38087
+ */
+void continuarHijos();
